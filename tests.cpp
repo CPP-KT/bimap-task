@@ -323,6 +323,38 @@ TEST(bimap, iterator_ops) {
   EXPECT_EQ(--it, it_next);
 }
 
+TEST(bimap, iterating) {
+  bimap<int, int> b;
+  b.insert(1, 0);
+  b.insert(2, 10);
+  b.insert(3, 100);
+  
+  std::vector<int> left_values;
+  for (auto it = b.begin_left(); it != b.end_left(); ++it) {
+    left_values.push_back(*it);
+  }
+  std::vector<int> left_values_inv;
+  for (auto it = b.end_left(); it != b.begin_left();) {
+    --it;
+    left_values_inv.push_back(*it);
+  }
+  std::reverse(left_values_inv.begin(), left_values_inv.end());
+  EXPECT_EQ(left_values, left_values_inv);
+  
+  
+  std::vector<int> right_values;
+  for (auto it = b.begin_right(); it != b.end_right(); ++it) {
+    right_values.push_back(*it);
+  }
+  std::vector<int> right_values_inv;
+  for (auto it = b.end_right(); it != b.end_left();) {
+    --it;
+    right_values_inv.push_back(*it);
+  }
+  std::reverse(right_values_inv.begin(), right_values_inv.end());
+  EXPECT_EQ(right_values, right_values_inv);
+}
+
 TEST(bimap, swap) {
   bimap<int, int> b, b1;
   b.insert(3, 4);
