@@ -347,7 +347,7 @@ TEST(bimap, iterating) {
     right_values.push_back(*it);
   }
   std::vector<int> right_values_inv;
-  for (auto it = b.end_right(); it != b.end_left();) {
+  for (auto it = b.end_right(); it != b.begin_right();) {
     --it;
     right_values_inv.push_back(*it);
   }
