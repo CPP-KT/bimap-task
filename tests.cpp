@@ -114,6 +114,9 @@ TEST(bimap, at_or_default) {
   bimap<int, int> b;
   b.insert(4, 2);
 
+  EXPECT_EQ(b.at_left_or_default(4), 2);
+  EXPECT_EQ(b.at_right_or_default(2), 4);
+  
   EXPECT_EQ(b.at_left_or_default(5), 0);
   EXPECT_EQ(b.at_right(0), 5);
 
