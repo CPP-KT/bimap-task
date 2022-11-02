@@ -278,6 +278,78 @@ TEST(bimap, upper_bound) {
   EXPECT_EQ(b.upper_bound_left(400), b.end_left());
 }
 
+TEST(bimap, lower_bound_randomized) {
+  bimap<unsigned long, unsigned long> b;
+  std::map<unsigned long, unsigned long> left_view, right_view;
+
+  std::mt19937 e(std::random_device{}());
+  for (size_t i = 0; i < 10000; i++) {
+    unsigned long left_element = e();
+    unsigned long right_element = e();
+    b.insert(left_element, right_element);
+    left_view.insert({left_element, right_element});
+    right_view.insert({right_element, left_element});
+  }
+
+  for (size_t i = 0; i < 20000; i++) {
+    unsigned long generated = 0;
+    auto it = left_view.end();
+    while (it == left_view.end()) {
+      generated = e();
+      it = left_view.lower_bound(generated);
+    }
+    EXPECT_EQ(*b.lower_bound_left(generated), it->first);
+    EXPECT_EQ(*(b.lower_bound_left(generated).flip()), it->second);
+  }
+
+  for (size_t i = 0; i < 30000; i++) {
+    unsigned long generated = 0;
+    auto it = right_view.end();
+    while (it == right_view.end()) {
+      generated = e();
+      it = right_view.lower_bound(generated);
+    }
+    EXPECT_EQ(*b.lower_bound_right(generated), it->first);
+    EXPECT_EQ(*(b.lower_bound_right(generated).flip()), it->second);
+  }
+}
+
+TEST(bimap, upper_bound_randomized) {
+  bimap<unsigned long, unsigned long> b;
+  std::map<unsigned long, unsigned long> left_view, right_view;
+
+  std::mt19937 e(std::random_device{}());
+  for (size_t i = 0; i < 10000; i++) {
+    unsigned long left_element = e();
+    unsigned long right_element = e();
+    b.insert(left_element, right_element);
+    left_view.insert({left_element, right_element});
+    right_view.insert({right_element, left_element});
+  }
+
+  for (size_t i = 0; i < 20000; i++) {
+    unsigned long generated = 0;
+    auto it = left_view.end();
+    while (it == left_view.end()) {
+      generated = e();
+      it = left_view.upper_bound(generated);
+    }
+    EXPECT_EQ(*b.upper_bound_left(generated), it->first);
+    EXPECT_EQ(*(b.upper_bound_left(generated).flip()), it->second);
+  }
+
+  for (size_t i = 0; i < 30000; i++) {
+    unsigned long generated = 0;
+    auto it = right_view.end();
+    while (it == right_view.end()) {
+      generated = e();
+      it = right_view.upper_bound(generated);
+    }
+    EXPECT_EQ(*b.upper_bound_right(generated), it->first);
+    EXPECT_EQ(*(b.upper_bound_right(generated).flip()), it->second);
+  }
+}
+
 TEST(bimap, assigment) {
   bimap<int, int> a;
   a.insert(1, 4);
