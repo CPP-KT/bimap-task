@@ -293,6 +293,48 @@ TEST(bimap, assigment) {
   EXPECT_EQ(a, b);
 }
 
+TEST(bimap, moving) {
+  {
+    bimap<int, int> a;
+    a.insert(1, 4);
+    a.insert(8, 8);
+    a.insert(25, 17);
+    a.insert(13, 37);
+    bimap<int, int> a_copy = a;
+    bimap<int, int> b = std::move(a);
+    EXPECT_EQ(b.size(), 4);
+    EXPECT_EQ(b, a_copy);
+
+    bimap<int, int> c;
+    c = std::move(b);
+    EXPECT_EQ(c.size(), 4);
+    EXPECT_EQ(c, a_copy);
+  } // `a` and `b` should be destroyed correctly
+}
+
+/* Lev said that non-copyable comparator is ok here. */
+TEST(bimap, non_copyable_comparator) {
+  class non_copyable_comparator : public std::less<int> {
+  public:
+    non_copyable_comparator() = default;
+    non_copyable_comparator(non_copyable_comparator const&) = delete;
+    non_copyable_comparator& operator=(non_copyable_comparator const&) = delete;
+    non_copyable_comparator(non_copyable_comparator&&) = default;
+    non_copyable_comparator& operator=(non_copyable_comparator&&) = default;
+    ~non_copyable_comparator() = default;
+  };
+
+  {
+    bimap<int, int, non_copyable_comparator, non_copyable_comparator> a;
+    a.insert(1, 4);
+    a.insert(8, 8);
+    a.insert(25, 17);
+    a.insert(13, 37);
+
+    bimap<int, int, non_copyable_comparator, non_copyable_comparator> b = std::move(a);
+  }
+}
+
 TEST(bimap, equivalence) {
   bimap<int, int> a;
   bimap<int, int> b;
