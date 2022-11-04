@@ -2,7 +2,6 @@
 
 #include "bimap.h"
 #include "test-classes.h"
-#include "gtest/gtest.h"
 
 TEST(bimap, leak_check) {
   bimap<unsigned long, unsigned long> b;
@@ -65,6 +64,40 @@ TEST(bimap, copies) {
   b1.insert(10, -10);
   b = b1;
   EXPECT_NE(b.find_right(-10), b.end_right());
+}
+
+TEST(bimap, throwing_in_copy_assignment) {
+  {
+    bimap<address_checking_object, int> a;
+    a.insert(1, 2);
+    a.insert(3, 4);
+    a.insert(5, 6);
+    a.insert(7, 8);
+    a.insert(9, 10);
+    address_checking_object::set_copy_throw_countdown(3);
+    bimap<address_checking_object, int> b;
+    try {
+      b = a;
+    } catch (std::runtime_error const& error) {}
+    EXPECT_EQ(b.size(), 0); // Checking strong guarantee.
+  }
+  address_checking_object::expect_no_instances();
+}
+
+TEST(bimap, throwing_in_copy_constructor) {
+  {
+    bimap<address_checking_object, int> a;
+    a.insert(1, 2);
+    a.insert(3, 4);
+    a.insert(5, 6);
+    a.insert(7, 8);
+    a.insert(9, 10);
+    address_checking_object::set_copy_throw_countdown(3);
+    try {
+      bimap<address_checking_object, int> b = a;
+    } catch (std::runtime_error const& error) {}
+  }
+  address_checking_object::expect_no_instances();
 }
 
 TEST(bimap, insert) {

@@ -1,5 +1,11 @@
 #pragma once
 
+#include <cmath>
+#include <unordered_set>
+#include <utility>
+
+#include "gtest/gtest.h"
+
 struct test_object {
   int a = 0;
   test_object() = default;
@@ -56,4 +62,31 @@ struct non_default_constructible {
 
 private:
   int a;
+};
+
+class address_checking_object {
+private:
+  static std::unordered_set<address_checking_object const*> addresses;
+
+  void add_instance() const;
+  void remove_instance() const;
+  void assert_exists() const;
+
+  int value;
+
+  static size_t copy_throw_countdown;
+  static void process_copying();
+
+public:
+  static void expect_no_instances();
+
+  static void set_copy_throw_countdown(size_t new_countdown);
+
+  /* implicit */ operator int() const;
+
+  address_checking_object();
+  /* implicit */ address_checking_object(int value);
+  address_checking_object(address_checking_object const& other);
+  address_checking_object& operator=(address_checking_object const& other);
+  ~address_checking_object();
 };
