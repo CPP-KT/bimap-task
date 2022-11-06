@@ -278,8 +278,7 @@ TEST(bimap, upper_bound) {
   EXPECT_EQ(b.upper_bound_left(400), b.end_left());
 }
 
-TEST(bimap, diff_lower_and_upper_bound)
-{
+TEST(bimap, diff_lower_and_upper_bound) {
   bimap<int, int> b;
 
   std::vector<std::pair<int, int>> data = {
