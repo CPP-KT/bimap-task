@@ -149,7 +149,7 @@ TEST(bimap, at_or_default) {
 
   EXPECT_EQ(b.at_left_or_default(4), 2);
   EXPECT_EQ(b.at_right_or_default(2), 4);
-  
+
   EXPECT_EQ(b.at_left_or_default(5), 0);
   EXPECT_EQ(b.at_right(0), 5);
 
@@ -367,7 +367,8 @@ TEST(bimap, non_copyable_comparator) {
     a.insert(25, 17);
     a.insert(13, 37);
 
-    bimap<int, int, non_copyable_comparator, non_copyable_comparator> b = std::move(a);
+    bimap<int, int, non_copyable_comparator, non_copyable_comparator> b =
+        std::move(a);
   }
 }
 
@@ -386,6 +387,42 @@ TEST(bimap, equivalence) {
 
   EXPECT_EQ(a.end_left().flip(), a.end_right());
   EXPECT_EQ(a.end_right().flip(), a.end_left());
+}
+
+struct modified_int {
+  modified_int(int a) : val(a) {}
+  bool operator==(const modified_int& rhs) const {
+    throw std::bad_function_call(); // you shouldn't use it while custom
+                                    // comparator exists
+  }
+
+  bool operator<(const modified_int& rhs) const {
+    throw std::bad_function_call(); // you shouldn't use it while custom
+                                    // comparator exists
+  }
+
+  int val;
+};
+
+struct modified_int_custom_comparator {
+public:
+  bool operator()(const modified_int& a, const modified_int& b) const {
+    return a.val < b.val;
+  }
+};
+
+TEST(bimap, equivalence_with_custom_comparator) {
+  bimap<modified_int, modified_int, modified_int_custom_comparator,
+        modified_int_custom_comparator>
+      a;
+  bimap<modified_int, modified_int, modified_int_custom_comparator,
+        modified_int_custom_comparator>
+      b;
+  a.insert(1, 2);
+  a.insert(3, 4);
+  b.insert(1, 2);
+  b.insert(3, 4);
+  EXPECT_EQ(a, b);
 }
 
 TEST(bimap, iterator_ops) {
