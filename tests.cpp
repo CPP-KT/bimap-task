@@ -53,6 +53,25 @@ TEST(bimap, custom_parametrized_comparator) {
   }
 }
 
+struct state_comparator {
+  state_comparator(bool flag = false) : is_inverted(flag) {}
+  bool operator()(int a, int b) const {
+    return is_inverted ? b < a : a < b;
+  }
+
+private:
+  bool is_inverted;
+};
+
+TEST(bimap, state_comparator) {
+  bimap<int, int, state_comparator, state_comparator> a(state_comparator(true));
+  a.insert(1, 2);
+  a.insert(3, 4);
+  a.insert(5, 6);
+  auto copy = a;
+  EXPECT_EQ(a, copy);
+}
+
 TEST(bimap, copies) {
   bimap<int, int> b;
   b.insert(3, 4);
