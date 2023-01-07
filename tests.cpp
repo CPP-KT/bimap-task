@@ -53,6 +53,7 @@ TEST(bimap, custom_parametrized_comparator) {
   }
 }
 
+namespace {
 struct state_comparator {
   state_comparator(bool flag = false) : is_inverted(flag) {}
   bool operator()(int a, int b) const {
@@ -62,6 +63,7 @@ struct state_comparator {
 private:
   bool is_inverted;
 };
+} // namespace
 
 TEST(bimap, state_comparator) {
   bimap<int, int, state_comparator, state_comparator> a(state_comparator(true));
@@ -168,7 +170,7 @@ TEST(bimap, at_or_default) {
 
   EXPECT_EQ(b.at_left_or_default(4), 2);
   EXPECT_EQ(b.at_right_or_default(2), 4);
-  
+
   EXPECT_EQ(b.at_left_or_default(5), 0);
   EXPECT_EQ(b.at_right(0), 5);
 
@@ -386,7 +388,8 @@ TEST(bimap, non_copyable_comparator) {
     a.insert(25, 17);
     a.insert(13, 37);
 
-    bimap<int, int, non_copyable_comparator, non_copyable_comparator> b = std::move(a);
+    bimap<int, int, non_copyable_comparator, non_copyable_comparator> b =
+        std::move(a);
   }
 }
 
