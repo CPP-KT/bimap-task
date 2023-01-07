@@ -389,6 +389,7 @@ TEST(bimap, equivalence) {
   EXPECT_EQ(a.end_right().flip(), a.end_left());
 }
 
+namespace {
 struct modified_int {
   modified_int(int a) : val(a) {}
   bool operator==(const modified_int& rhs) const {
@@ -410,6 +411,7 @@ public:
     return a.val < b.val;
   }
 };
+} // namespace
 
 TEST(bimap, equivalence_with_custom_comparator) {
   bimap<modified_int, modified_int, modified_int_custom_comparator,
