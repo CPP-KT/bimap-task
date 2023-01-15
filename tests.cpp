@@ -335,6 +335,26 @@ TEST(bimap, upper_bound) {
   EXPECT_EQ(b.upper_bound_left(400), b.end_left());
 }
 
+TEST(bimap, diff_lower_and_upper_bound) {
+  bimap<int, int> b;
+
+  std::vector<std::pair<int, int>> data = {
+      {1, 2}, {2, 3}, {3, 4}, {8, 16}, {32, 66}};
+
+  std::shuffle(data.begin(), data.end(), std::random_device{});
+  for (auto const& p : data) {
+    b.insert(p.first, p.second);
+  }
+
+  EXPECT_EQ(*b.lower_bound_left(5), *b.upper_bound_left(5));
+  EXPECT_NE(*b.lower_bound_left(8), *b.upper_bound_left(8));
+  EXPECT_EQ(*b.lower_bound_right(7), *b.upper_bound_right(7));
+  EXPECT_NE(*b.lower_bound_right(4), *b.upper_bound_right(4));
+
+  EXPECT_EQ(b.lower_bound_right(100), b.upper_bound_right(100));
+  EXPECT_EQ(b.lower_bound_left(100), b.upper_bound_left(100));
+}
+
 TEST(bimap, assigment) {
   bimap<int, int> a;
   a.insert(1, 4);
