@@ -481,6 +481,22 @@ TEST(bimap, move_ctor) {
   address_checking_object::set_copy_throw_countdown(0);
 }
 
+TEST(bimap, comparator_use_after_move) {
+  using bimap = bimap<int, int, no_use_after_move_comparator, no_use_after_move_comparator>;
+  bimap a;
+  a.insert(1, 4);
+  a.insert(8, 8);
+  a.insert(25, 17);
+  a.insert(13, 37);
+
+  {
+    bimap a_copy = a;
+
+    bimap b = std::move(a);
+    EXPECT_EQ(b, a_copy);
+  }
+}
+
 TEST(bimap, move_assignment) {
   bimap<address_checking_object, int> a;
   a.insert(1, 4);
@@ -500,6 +516,25 @@ TEST(bimap, move_assignment) {
   EXPECT_EQ(b, a_copy);
 
   address_checking_object::set_copy_throw_countdown(0);
+}
+
+TEST(bimap, comparator_use_after_move_assignment) {
+  using bimap = bimap<int, int, no_use_after_move_comparator, no_use_after_move_comparator>;
+
+  bimap a;
+  a.insert(1, 4);
+  a.insert(8, 8);
+  a.insert(25, 17);
+  a.insert(13, 37);
+
+  bimap b;
+  b.insert(2, 5);
+  b.insert(5, 2);
+
+  bimap a_copy = a;
+
+  b = std::move(a);
+  EXPECT_EQ(b, a_copy);
 }
 
 TEST(bimap, move_assignment_self) {

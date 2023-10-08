@@ -159,6 +159,37 @@ public:
   ~non_default_constructible_comparator() = default;
 };
 
+class no_use_after_move_comparator {
+  bool has_moved = false;
+
+public:
+  no_use_after_move_comparator() = default;
+
+  no_use_after_move_comparator(const no_use_after_move_comparator&) = default;
+
+  no_use_after_move_comparator(no_use_after_move_comparator&& that) noexcept {
+    that.has_moved = true;
+  }
+
+  no_use_after_move_comparator& operator=(const no_use_after_move_comparator&) = default;
+
+  no_use_after_move_comparator& operator=(no_use_after_move_comparator&& that) noexcept {
+    that.has_moved = true;
+    return *this;
+  }
+
+  template <typename L, typename R>
+  bool operator()(L&& left, R&& right) const {
+    if (has_moved) {
+      throw std::bad_function_call();
+    }
+    return std::less<>()(std::forward<L>(left), std::forward<R>(right));
+  }
+
+  ~no_use_after_move_comparator() = default;
+};
+
+
 class modified_int_custom_comparator;
 
 class modified_int {
