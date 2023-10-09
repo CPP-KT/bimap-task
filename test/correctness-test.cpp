@@ -834,7 +834,7 @@ TEST(exception_safety, mass_insert) {
   std::set<int> keys;
   std::set<int> values;
 
-  for (int i = 0; i < 15; ++i) {
+  for (int i = 0; i < 16; ++i) {
     keys.insert(dist(rng));
     values.insert(dist(rng));
   }
@@ -970,7 +970,7 @@ TEST(exception_safety, mass_erase) {
   std::set<int> keys;
   std::set<int> values;
 
-  for (int i = 0; i < 15; ++i) {
+  for (int i = 0; i < 14; ++i) {
     keys.insert(dist(rng));
     values.insert(dist(rng));
   }
