@@ -850,6 +850,7 @@ TEST(exception_safety, mass_insert) {
         strong_exception_safety_guard sg(c);
         c.insert(keys_v[i], vals_v[i]);
       }
+      EXPECT_EQ(c.size(), len-i);
       for (int j = i; j < len; ++j) {
         auto& actual = *c.find_left(keys_v[j]).flip();
         EXPECT_EQ(actual, vals_v[j]);
@@ -994,6 +995,7 @@ TEST(exception_safety, mass_erase) {
         else
           c.erase_right(vals_v[i]);
       }
+      EXPECT_EQ(c.size(), i);
       for (int j = 0; j < i; ++j) {
         auto& actual_value = *c.find_left(keys_v[j]).flip();
         EXPECT_EQ(actual_value, vals_v[j]);
