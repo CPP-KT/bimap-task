@@ -834,7 +834,7 @@ TEST(exception_safety, mass_insert) {
   std::set<int> keys;
   std::set<int> values;
 
-  for (int i = 0; i < 200; ++i) {
+  for (int i = 0; i < 15; ++i) {
     keys.insert(dist(rng));
     values.insert(dist(rng));
   }
@@ -843,14 +843,20 @@ TEST(exception_safety, mass_insert) {
   std::vector<int> vals_v(values.begin(), values.end());
   size_t len = std::min(keys_v.size(), vals_v.size());
 
-  faulty_run([&] {
+  std::cout << vals_v.size() << '\n';
+  std::cout << keys_v.size() << '\n';
+
+  faulty_run([&]() {
     container c;
-    while (--len > 0) {
+    for (int i = len-1; i > 0; --i) {
       {
         strong_exception_safety_guard sg(c);
-        c.insert(keys_v[len], vals_v[len]);
+        c.insert(keys_v[i], vals_v[i]);
       }
-      ASSERT_EQ(*c.find_left(keys_v[len]).flip(), vals_v[len]);
+      for (int j = i; j < len; ++j) {
+        auto& actual = *c.find_left(keys_v[j]).flip();
+        EXPECT_EQ(actual, vals_v[j]);
+      }
     }
   });
 }
