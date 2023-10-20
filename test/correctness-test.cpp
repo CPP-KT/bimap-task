@@ -394,6 +394,21 @@ TEST(bimap, lower_bound) {
   } while (std::next_permutation(data.begin(), data.end()));
 }
 
+TEST(bimap, lower_bound_non_copyable) {
+  bimap<test_object, test_object> b;
+  b.insert(test_object(1),  test_object(2));
+  b.insert(test_object(2),  test_object(3));
+  b.insert(test_object(3),  test_object(4));
+  b.insert(test_object(8),  test_object(16));
+  b.insert(test_object(32),  test_object(66));
+
+  EXPECT_EQ(*b.lower_bound_left(test_object(5)), test_object(8));
+  EXPECT_EQ(*b.lower_bound_right(test_object(4)), test_object(4));
+  EXPECT_EQ(*b.lower_bound_left(test_object(4)).flip(), test_object(16));
+  EXPECT_EQ(b.lower_bound_right(test_object(100)), b.end_right());
+  EXPECT_EQ(b.lower_bound_left(test_object(100)), b.end_left());
+}
+
 TEST(bimap, upper_bound) {
   std::vector<std::pair<int, int>> data = {
       { 1,  2},
@@ -418,6 +433,20 @@ TEST(bimap, upper_bound) {
     EXPECT_EQ(b.upper_bound_left(400), b.end_left());
 
   } while (std::next_permutation(data.begin(), data.end()));
+}
+
+TEST(bimap, upper_bound_non_copyable) {
+  bimap<test_object, test_object> b;
+  b.insert(test_object(1),  test_object(2));
+  b.insert(test_object(2),  test_object(3));
+  b.insert(test_object(3),  test_object(4));
+  b.insert(test_object(8),  test_object(16));
+  b.insert(test_object(32),  test_object(66));
+
+  EXPECT_EQ(*b.upper_bound_left(test_object(5)), test_object(8));
+  EXPECT_EQ(*b.upper_bound_right(test_object(-100)), test_object(2));
+  EXPECT_EQ(b.upper_bound_right(test_object(100)), b.end_right());
+  EXPECT_EQ(b.upper_bound_left(test_object(400)), b.end_left());
 }
 
 TEST(bimap, copy_ctor) {
