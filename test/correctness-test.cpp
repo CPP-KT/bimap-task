@@ -290,6 +290,18 @@ TEST(bimap, find) {
   EXPECT_EQ(b.find_right(-1000), b.end_right());
 }
 
+TEST(bimap, find_non_copyable) {
+  bimap<test_object, test_object> b;
+  b.insert(test_object(3), test_object(4));
+  b.insert(test_object(4), test_object(5));
+  b.insert(test_object(42), test_object(1000));
+
+  EXPECT_EQ(*b.find_right(test_object(5)).flip(), test_object(4));
+  EXPECT_EQ(*b.find_left(test_object(3)).flip(), test_object(4));
+  EXPECT_EQ(b.find_left(test_object(3436)), b.end_left());
+  EXPECT_EQ(b.find_right(test_object(-1000)), b.end_right());
+}
+
 TEST(bimap, empty) {
   bimap<int, int> b;
   EXPECT_TRUE(b.empty());
@@ -396,11 +408,11 @@ TEST(bimap, lower_bound) {
 
 TEST(bimap, lower_bound_non_copyable) {
   bimap<test_object, test_object> b;
-  b.insert(test_object(1),  test_object(2));
-  b.insert(test_object(2),  test_object(3));
-  b.insert(test_object(3),  test_object(4));
-  b.insert(test_object(8),  test_object(16));
-  b.insert(test_object(32),  test_object(66));
+  b.insert(test_object(1), test_object(2));
+  b.insert(test_object(2), test_object(3));
+  b.insert(test_object(3), test_object(4));
+  b.insert(test_object(8), test_object(16));
+  b.insert(test_object(32), test_object(66));
 
   EXPECT_EQ(*b.lower_bound_left(test_object(5)), test_object(8));
   EXPECT_EQ(*b.lower_bound_right(test_object(4)), test_object(4));
@@ -437,11 +449,11 @@ TEST(bimap, upper_bound) {
 
 TEST(bimap, upper_bound_non_copyable) {
   bimap<test_object, test_object> b;
-  b.insert(test_object(1),  test_object(2));
-  b.insert(test_object(2),  test_object(3));
-  b.insert(test_object(3),  test_object(4));
-  b.insert(test_object(8),  test_object(16));
-  b.insert(test_object(32),  test_object(66));
+  b.insert(test_object(1), test_object(2));
+  b.insert(test_object(2), test_object(3));
+  b.insert(test_object(3), test_object(4));
+  b.insert(test_object(8), test_object(16));
+  b.insert(test_object(32), test_object(66));
 
   EXPECT_EQ(*b.upper_bound_left(test_object(5)), test_object(8));
   EXPECT_EQ(*b.upper_bound_right(test_object(-100)), test_object(2));
