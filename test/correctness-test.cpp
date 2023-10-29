@@ -483,18 +483,17 @@ TEST(bimap, move_ctor) {
 
 TEST(bimap, comparator_use_after_move) {
   using bimap = bimap<int, int, no_use_after_move_comparator, no_use_after_move_comparator>;
+
   bimap a;
   a.insert(1, 4);
   a.insert(8, 8);
   a.insert(25, 17);
   a.insert(13, 37);
 
-  {
-    bimap a_copy = a;
+  bimap a_copy = a;
 
-    bimap b = std::move(a);
-    EXPECT_EQ(b, a_copy);
-  }
+  bimap b = std::move(a);
+  EXPECT_EQ(b, a_copy);
 }
 
 TEST(bimap, move_assignment) {
