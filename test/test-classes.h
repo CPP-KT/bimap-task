@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <functional>
+#include <stdexcept>
 #include <unordered_set>
 #include <utility>
 
@@ -181,7 +182,7 @@ public:
   template <typename L, typename R>
   bool operator()(L&& left, R&& right) const {
     if (has_moved) {
-      throw std::bad_function_call();
+      throw std::runtime_error("used of moved comparator");
     }
     return std::less<>()(std::forward<L>(left), std::forward<R>(right));
   }
