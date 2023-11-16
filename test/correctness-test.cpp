@@ -496,6 +496,26 @@ TEST(bimap, comparator_use_after_move) {
   EXPECT_EQ(b, a_copy);
 }
 
+TEST(bimap, unique_comparator_move) {
+  using bimap = bimap<int, int, unique_comparator<1>, unique_comparator<2>>;
+
+  bimap a(unique_comparator<1>(1), unique_comparator<2>(1));
+  a.insert(1, 4);
+  a.insert(8, 8);
+
+  bimap b = std::move(a);
+
+  unique_comparator<1>::reset_last_used_id();
+  EXPECT_EQ(b.at_left(1), 4);
+  EXPECT_EQ(b.at_left(8), 8);
+  EXPECT_EQ(unique_comparator<1>::get_last_used_id(), 1);
+
+  unique_comparator<2>::reset_last_used_id();
+  EXPECT_EQ(b.at_right(4), 1);
+  EXPECT_EQ(b.at_right(8), 8);
+  EXPECT_EQ(unique_comparator<2>::get_last_used_id(), 1);
+}
+
 TEST(bimap, move_assignment) {
   bimap<address_checking_object, int> a;
   a.insert(1, 4);
@@ -534,6 +554,30 @@ TEST(bimap, comparator_use_after_move_assignment) {
 
   b = std::move(a);
   EXPECT_EQ(b, a_copy);
+}
+
+TEST(bimap, unique_comparator_move_assignment) {
+  using bimap = bimap<int, int, unique_comparator<1>, unique_comparator<2>>;
+
+  bimap a(unique_comparator<1>(1), unique_comparator<2>(1));
+  a.insert(1, 4);
+  a.insert(8, 8);
+
+  bimap b;
+  b.insert(2, 5);
+  b.insert(5, 2);
+
+  b = std::move(a);
+
+  unique_comparator<1>::reset_last_used_id();
+  EXPECT_EQ(b.at_left(1), 4);
+  EXPECT_EQ(b.at_left(8), 8);
+  EXPECT_EQ(unique_comparator<1>::get_last_used_id(), 1);
+
+  unique_comparator<2>::reset_last_used_id();
+  EXPECT_EQ(b.at_right(4), 1);
+  EXPECT_EQ(b.at_right(8), 8);
+  EXPECT_EQ(unique_comparator<2>::get_last_used_id(), 1);
 }
 
 TEST(bimap, move_assignment_self) {
@@ -656,4 +700,25 @@ TEST(bimap, swap) {
   swap(b, b1);
   EXPECT_EQ(*b1.find_left(3), 3);
   EXPECT_EQ(*b.find_right(3), 3);
+}
+
+TEST(bimap, unique_comparators_swap) {
+  using bimap = bimap<int, int, unique_comparator<1>, unique_comparator<2>>;
+
+  bimap b1(unique_comparator<1>(1), unique_comparator<2>(1)), b2(unique_comparator<1>(2), unique_comparator<2>(2));
+  b2.insert(3, 4);
+  b2.insert(4, 5);
+
+  using std::swap;
+  swap(b1, b2);
+
+  unique_comparator<1>::reset_last_used_id();
+  EXPECT_EQ(b1.at_left(3), 4);
+  EXPECT_EQ(b1.at_left(4), 5);
+  EXPECT_EQ(unique_comparator<1>::get_last_used_id(), 2);
+
+  unique_comparator<2>::reset_last_used_id();
+  EXPECT_EQ(b1.at_right(4), 3);
+  EXPECT_EQ(b1.at_right(5), 4);
+  EXPECT_EQ(unique_comparator<2>::get_last_used_id(), 2);
 }
