@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <functional>
+#include <stdexcept>
 #include <unordered_set>
 #include <utility>
 
@@ -159,6 +160,37 @@ public:
   ~non_default_constructible_comparator() = default;
 };
 
+class no_use_after_move_comparator {
+  bool has_moved = false;
+
+public:
+  no_use_after_move_comparator() = default;
+
+  no_use_after_move_comparator(const no_use_after_move_comparator&) = default;
+
+  no_use_after_move_comparator(no_use_after_move_comparator&& that) noexcept {
+    that.has_moved = true;
+  }
+
+  no_use_after_move_comparator& operator=(const no_use_after_move_comparator&) = default;
+
+  no_use_after_move_comparator& operator=(no_use_after_move_comparator&& that) noexcept {
+    has_moved = that.has_moved;
+    that.has_moved = true;
+    return *this;
+  }
+
+  template <typename L, typename R>
+  bool operator()(L&& left, R&& right) const {
+    if (has_moved) {
+      throw std::runtime_error("used of moved comparator");
+    }
+    return std::less<>()(std::forward<L>(left), std::forward<R>(right));
+  }
+
+  ~no_use_after_move_comparator() = default;
+};
+
 class modified_int_custom_comparator;
 
 class modified_int {
@@ -182,5 +214,41 @@ class modified_int_custom_comparator {
 public:
   bool operator()(const modified_int& a, const modified_int& b) const {
     return a.val < b.val;
+  }
+};
+
+constexpr int complex_cmp_default = 0;
+
+template <int type_id = complex_cmp_default>
+class unique_comparator {
+  inline static int last_used_id{};
+
+  int id;
+
+public:
+  explicit unique_comparator(int id = -1) : id(id) {}
+
+  unique_comparator(unique_comparator&& that) : id(that.id) {
+    that.id = -1;
+  }
+
+  unique_comparator& operator=(unique_comparator&& that) {
+    id = that.id;
+    that.id = -1;
+    return *this;
+  }
+
+  template <typename L, typename R>
+  bool operator()(L&& left, R&& right) const {
+    last_used_id = id;
+    return std::less<>()(std::forward<L>(left), std::forward<R>(right));
+  }
+
+  static int get_last_used_id() {
+    return last_used_id;
+  }
+
+  static void reset_last_used_id() {
+    last_used_id = -1;
   }
 };
