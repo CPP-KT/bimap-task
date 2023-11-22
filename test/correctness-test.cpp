@@ -8,6 +8,9 @@
 template class bimap<int, non_default_constructible>;
 template class bimap<non_default_constructible, int>;
 
+template class bimap<int, non_copy_assignable>;
+template class bimap<non_copy_assignable, int>;
+
 TEST(bimap, simple) {
   bimap<int, int> b;
   b.insert(4, 4);
