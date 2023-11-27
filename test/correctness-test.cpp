@@ -621,6 +621,12 @@ TEST(bimap, iterator_traits) {
   EXPECT_TRUE((std::is_same_v<std::iterator_traits<bm::right_iterator>::pointer, const double*>));
 }
 
+TEST(bimap, iterator_sizeof) {
+  using bm = bimap<int, double>;
+  static_assert(sizeof(bm::left_iterator) <= sizeof(void*));
+  static_assert(sizeof(bm::right_iterator) <= sizeof(void*));
+}
+
 TEST(bimap, iterator_ops) {
   bimap<int, int> b;
   b.insert(3, 4);
