@@ -42,10 +42,12 @@ TEST_CASE("Custom comparator") {
   int prev = *b.begin_left();
   for (auto it = ++b.begin_left(); it != b.end_left(); it++) {
     REQUIRE(prev > *it);
+    prev = *it;
   }
   prev = *b.begin_right();
   for (auto it = ++b.begin_right(); it != b.end_right(); it++) {
     REQUIRE(prev < *it);
+    prev = *it;
   }
 }
 
